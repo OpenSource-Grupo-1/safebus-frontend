@@ -1,0 +1,35 @@
+{
+  "conductores": [
+    { "id": 1, "nombre": "MARCOS E.", "apellido": "SILVA", "dni": "12345678", "codigoEmpleado": "EMP-001", "codigoQr": "QR-SF-90210-TX", "placa": "ABC-1234", "estado": "ACTIVO", "foto": "https://i.pravatar.cc/80?img=11" },
+    { "id": 2, "nombre": "JUAN", "apellido": "QUISPE", "dni": "23456789", "codigoEmpleado": "EMP-002", "codigoQr": "QR-SF-90211-TX", "placa": "DEF-5678", "estado": "ACTIVO", "foto": "https://i.pravatar.cc/80?img=12" },
+    { "id": 3, "nombre": "PEDRO", "apellido": "MAMANI", "dni": "34567890", "codigoEmpleado": "EMP-003", "codigoQr": "QR-SF-90212-TX", "placa": "GHI-9012", "estado": "INACTIVO", "foto": "https://i.pravatar.cc/80?img=13" },
+    { "id": 4, "nombre": "MIGUEL", "apellido": "FLORES", "dni": "45678901", "codigoEmpleado": "EMP-004", "codigoQr": "QR-SF-90213-TX", "placa": "JKL-3456", "estado": "ACTIVO", "foto": "https://i.pravatar.cc/80?img=14" },
+    { "id": 5, "nombre": "LUIS", "apellido": "CCAMA", "dni": "56789012", "codigoEmpleado": "EMP-005", "codigoQr": "QR-SF-90214-TX", "placa": "MNO-7890", "estado": "ACTIVO", "foto": "https://i.pravatar.cc/80?img=15" },
+    { "id": 6, "nombre": "CARLOS", "apellido": "HUANCA", "dni": "67890123", "codigoEmpleado": "EMP-006", "codigoQr": "QR-SF-90215-TX", "placa": "PQR-1234", "estado": "ACTIVO", "foto": "https://i.pravatar.cc/80?img=16" },
+    { "id": 7, "nombre": "ROBERTO", "apellido": "APAZA", "dni": "78901234", "codigoEmpleado": "EMP-007", "codigoQr": "QR-SF-90216-TX", "placa": "STU-5678", "estado": "ACTIVO", "foto": "https://i.pravatar.cc/80?img=17" }
+  ],
+  "turnos": [
+    { "id": 1, "conductorId": 1, "busId": "BUS-7729", "rutaNombre": "R-42", "rutaOrigen": "Terminal Norte", "rutaDestino": "Estación Central", "distanciaKm": 32.5, "tiempoSegundos": 27735, "pasajeros": 45, "recaudacion": 890.00, "estado": "FINALIZADO", "fechaInicio": "2025-04-25T06:00:00", "fechaFin": "2025-04-25T14:00:00" },
+    { "id": 2, "conductorId": 2, "busId": "BUS-5500", "rutaNombre": "R-15", "rutaOrigen": "Comas", "rutaDestino": "San Isidro", "distanciaKm": 28.0, "tiempoSegundos": 28800, "pasajeros": 38, "recaudacion": 760.00, "estado": "FINALIZADO", "fechaInicio": "2025-04-25T07:00:00", "fechaFin": "2025-04-25T15:00:00" }
+  ],
+  "alertas": [
+    { "id": 1, "conductorId": 3, "turnoId": 3, "tipo": "PANICO", "nivelRiesgo": "CRITICO", "latitud": -12.156, "longitud": -76.9724, "timestamp": "2025-04-26T07:05:00", "descripcion": "Conductor activó botón de pánico en ruta 3", "resuelta": false },
+    { "id": 2, "conductorId": 3, "turnoId": 3, "tipo": "VELOCIDAD", "nivelRiesgo": "ALTO", "latitud": -12.158, "longitud": -76.975, "timestamp": "2025-04-26T07:02:00", "descripcion": "Velocidad excede límite: 75 km/h en zona escolar", "resuelta": false },
+    { "id": 3, "conductorId": 3, "turnoId": 3, "tipo": "PASAJEROS", "nivelRiesgo": "MEDIO", "latitud": -12.156, "longitud": -76.9724, "timestamp": "2025-04-26T07:30:00", "descripcion": "Capacidad excedida: 90 pasajeros abordo", "resuelta": false },
+    { "id": 4, "conductorId": 1, "turnoId": 1, "tipo": "DESVIO", "nivelRiesgo": "BAJO", "latitud": -12.0512, "longitud": -77.0489, "timestamp": "2025-04-25T07:00:00", "descripcion": "Desvío menor detectado, conductor reportó tráfico", "resuelta": true }
+  ],
+  "pasajeros": [
+    { "id": 1, "turnoId": 1, "busId": "BUS-7729", "totalAbordaron": 45, "totalBajaron": 30, "totalAbordo": 15, "timestamp": "2025-04-25T08:00:00", "anomalia": false },
+    { "id": 2, "turnoId": 1, "busId": "BUS-7729", "totalAbordaron": 20, "totalBajaron": 10, "totalAbordo": 25, "timestamp": "2025-04-25T10:00:00", "anomalia": false },
+    { "id": 3, "turnoId": 3, "busId": "BUS-7729", "totalAbordaron": 90, "totalBajaron": 5, "totalAbordo": 85, "timestamp": "2025-04-26T07:30:00", "anomalia": true }
+  ],
+  "unidades": [
+    { "id": 1, "placa": "ABC-1234", "conductor": "Marcos E. Silva", "ruta": "R-42", "estado": "ACTIVO", "lat": -12.0464, "lng": -77.0428, "pasajeros": 32, "velocidad": 48 },
+    { "id": 2, "placa": "DEF-5678", "conductor": "Juan Quispe",     "ruta": "R-15", "estado": "ACTIVO", "lat": -12.06,   "lng": -77.03,   "pasajeros": 18, "velocidad": 52 },
+    { "id": 3, "placa": "GHI-9012", "conductor": "Pedro Mamani",    "ruta": "R-07", "estado": "ALERTA", "lat": -12.07,   "lng": -77.05,   "pasajeros": 45, "velocidad": 75 },
+    { "id": 4, "placa": "JKL-3456", "conductor": "Miguel Flores",   "ruta": "R-22", "estado": "ACTIVO", "lat": -12.09,   "lng": -77.06,   "pasajeros": 10, "velocidad": 40 },
+    { "id": 5, "placa": "MNO-7890", "conductor": "Luis Ccama",      "ruta": "R-33", "estado": "INACTIVO","lat": -12.10,  "lng": -77.02,   "pasajeros": 0,  "velocidad": 0  },
+    { "id": 6, "placa": "PQR-1234", "conductor": "Carlos Huanca",   "ruta": "R-42", "estado": "ACTIVO", "lat": -12.03,   "lng": -77.01,   "pasajeros": 27, "velocidad": 55 },
+    { "id": 7, "placa": "STU-5678", "conductor": "Roberto Apaza",   "ruta": "R-08", "estado": "ACTIVO", "lat": -12.02,   "lng": -77.04,   "pasajeros": 38, "velocidad": 43 }
+  ]
+}

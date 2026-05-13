@@ -1,0 +1,44 @@
+<div class="dm-root">
+  <div class="dm-header">
+    <div>
+      <h2 class="dm-title">GESTIÓN DE CONDUCTORES</h2>
+      <p class="dm-sub">{{ conductores().length }} conductores registrados</p>
+    </div>
+    <div class="dm-search">
+      <mat-icon>search</mat-icon>
+      <input placeholder="Buscar conductor..."
+             [value]="searchTerm()"
+             (input)="searchTerm.set($any($event.target).value)" />
+    </div>
+  </div>
+
+  <div class="driver-table">
+    <div class="table-header">
+      <span>CONDUCTOR</span>
+      <span>DNI</span>
+      <span>CÓD. EMPLEADO</span>
+      <span>PLACA</span>
+      <span>ESTADO</span>
+      <span>ACCIONES</span>
+    </div>
+    @for (c of filtered; track c.id) {
+      <div class="table-row" [class.row-selected]="selected() === c.id" (click)="selected.set(c.id)">
+        <div class="driver-cell">
+          <img [src]="c.foto" [alt]="c.nombre" class="driver-photo" />
+          <div>
+            <p class="driver-name">{{ c.nombre }} {{ c.apellido }}</p>
+            <p class="driver-qr">{{ c.codigoQr }}</p>
+          </div>
+        </div>
+        <span class="cell-mono">{{ c.dni }}</span>
+        <span class="cell-mono">{{ c.codigoEmpleado }}</span>
+        <span class="cell-accent">{{ c.placa }}</span>
+        <span class="cell-estado" [style.color]="estadoColor(c.estado)">{{ c.estado }}</span>
+        <div class="cell-actions">
+          <button class="action-btn"><mat-icon>edit</mat-icon></button>
+          <button class="action-btn red"><mat-icon>block</mat-icon></button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

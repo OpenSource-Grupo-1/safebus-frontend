@@ -1,0 +1,71 @@
+<div class="dash-root">
+  <div class="dash-main">
+    <div class="sb-card service-card">
+      <p class="section-label">RESUMEN DE TURNO FINALIZADO</p>
+      @if (turno) {
+        <div class="metrics-row">
+          <div class="metric">
+            <span class="sb-label">DISTANCIA</span>
+            <span class="sb-value">{{ turno.distanciaKm | number:'1.1-1' }} KM</span>
+          </div>
+          <div class="metric">
+            <span class="sb-label">TIEMPO TOTAL</span>
+            <span class="sb-value mono">{{ formatTime(turno.tiempoSegundos) }}</span>
+          </div>
+          <div class="metric">
+            <span class="sb-label">PASAJEROS</span>
+            <span class="sb-value">{{ turno.pasajeros }}</span>
+          </div>
+          <div class="metric">
+            <span class="sb-label">RECAUDACIÓN</span>
+            <span class="sb-value">${{ turno.recaudacion | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="sb-card route-card">
+      <p class="section-label">RUTA OPERADA</p>
+      <div class="route-row">
+        <span class="route-badge">R-42</span>
+        <div class="route-info">
+          <p class="route-name">Terminal Norte → Estación Central</p>
+          <p class="route-sub">Última parada: Calle 45 con Av. Principal</p>
+        </div>
+        <button class="sb-btn-primary new-service-btn" (click)="newService()">INICIAR NUEVO SERVICIO</button>
+      </div>
+    </div>
+
+    <div class="sb-card protocol-card">
+      <p class="section-label">PROTOCOLO DE CIERRE</p>
+      <div class="check-list">
+        <label class="check-row"><input type="checkbox" /><span>Vehículo estacionado en zona segura / terminal</span></label>
+        <label class="check-row"><input type="checkbox" /><span>Verificación de interior sin objetos perdidos</span></label>
+        <label class="check-row"><input type="checkbox" /><span>Validación de total de pasajeros en consola</span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-right">
+    <div class="sb-card finish-card">
+      <div class="power-icon"><mat-icon>power_settings_new</mat-icon></div>
+      <p class="finish-label">CONFIRMACIÓN FINAL</p>
+      <button class="finish-btn" disabled>FINALIZAR SERVICIO</button>
+      <p class="finish-warning">ESTA ACCIÓN NO PUEDE DESHACERSE</p>
+    </div>
+    <div class="sb-card status-card">
+      <p class="section-label">ESTADO DEL SISTEMA</p>
+      <div class="status-rows">
+        <div class="status-row"><span class="st-key">GPS</span><span class="st-val">ESTABLE</span></div>
+        <div class="status-row"><span class="st-key">TELEMETRÍA</span><span class="st-val">SINCRO</span></div>
+        <div class="status-row"><span class="st-key">RED CLOUD</span><span class="st-val">ACTIVA</span></div>
+      </div>
+    </div>
+    <div class="map-preview">
+      <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=-77.0700,-12.1200,-76.9400,-12.0200&layer=mapnik&marker=-12.0464,-77.0428"
+        width="100%" height="100%" style="border:none; filter:brightness(0.7) saturate(0.6);" title="Mapa Lima">
+      </iframe>
+      <div class="map-overlay-bar"><span class="dot-g-sm"></span> VIGILANCIA ACTIVA: TRANSMITIENDO A CENTRAL</div>
+    </div>
+  </div>
+</div>

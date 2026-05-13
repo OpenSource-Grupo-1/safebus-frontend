@@ -1,0 +1,39 @@
+<div class="layout-root">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-text">SafeBus</span>
+      <span class="role-tag">ADMINISTRADOR</span>
+    </div>
+    <nav class="sidebar-nav">
+      @for (item of navItems(); track item.route) {
+        <a class="nav-item" [routerLink]="item.route" routerLinkActive="nav-active">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+    <div class="sidebar-bottom">
+      <a class="back-conductor-btn" routerLink="/conductor/dashboard">
+        <mat-icon>arrow_back</mat-icon> VOLVER A CONDUCTOR
+      </a>
+      <a class="settings-link" routerLink="/conductor/login">
+        <mat-icon>logout</mat-icon> CERRAR SESIÓN
+      </a>
+    </div>
+  </aside>
+  <div class="main-area">
+    <header class="toolbar">
+      <div class="toolbar-left">
+        <span class="toolbar-title">SAFEBUS ADMIN</span>
+        <span class="toolbar-sep">|</span>
+        <span class="toolbar-unit">PANEL DE CONTROL</span>
+      </div>
+      <div class="toolbar-right">
+        <mat-icon class="tb-icon">notifications_none</mat-icon>
+        <mat-icon class="tb-icon">account_circle</mat-icon>
+        <span class="live-badge">SISTEMA ACTIVO</span>
+      </div>
+    </header>
+    <main class="content-area"><router-outlet /></main>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+{
+  "nav.dashboard": "Dashboard",
+  "nav.passengers": "Passenger Count",
+  "nav.administration": "Administration",
+  "nav.apiConsole": "API Console",
+  "nav.alertLogs": "Alert Logs",
+  "nav.settings": "Settings",
+  "nav.support": "Support",
+  "nav.controlCenter": "Control Center",
+  "nav.driverManagement": "Driver Management",
+  "nav.unitAssignment": "Unit Assignment",
+  "nav.notifications": "Notifications",
+  "nav.shiftHistory": "Shift History",
+  "nav.impactNumbers": "Impact Numbers",
+  "btn.panicSignal": "PANIC SIGNAL",
+  "btn.finishService": "FINISH SERVICE",
+  "btn.startShift": "START SHIFT →",
+  "btn.verifyCredentials": "VERIFY CREDENTIALS",
+  "btn.validateIdentity": "VALIDATE IDENTITY"
+}
