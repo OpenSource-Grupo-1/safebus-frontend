@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { UnidadBus, AlertaAdmin, TurnoHistorial } from '../domain/model/admin.entity';
-import { MOCK_CONDUCTORES } from '../../conductor/infrastructure/conductor-api-endpoint';
 
 @Injectable({ providedIn: 'root' })
 export class AdminDataService {
+
   getUnidades(): UnidadBus[] {
     return [
       new UnidadBus({ id:1, placa:'ABC-1234', conductor:'Marcos E. Silva', ruta:'R-42', estado:'ACTIVO',   lat:-12.0464, lng:-77.0428, pasajeros:32, velocidad:48 }),
@@ -18,15 +18,25 @@ export class AdminDataService {
 
   getAlertas(): AlertaAdmin[] {
     return [
-      new AlertaAdmin({ id:1, tipo:'PÁNICO',    bus:'GHI-9012', conductor:'Pedro Mamani',   hora:'07:05', nivel:'CRITICO', resuelta:false }),
-      new AlertaAdmin({ id:2, tipo:'VELOCIDAD', bus:'GHI-9012', conductor:'Pedro Mamani',   hora:'07:02', nivel:'ALTO',    resuelta:false }),
-      new AlertaAdmin({ id:3, tipo:'PASAJEROS', bus:'GHI-9012', conductor:'Pedro Mamani',   hora:'07:30', nivel:'MEDIO',   resuelta:false }),
-      new AlertaAdmin({ id:4, tipo:'DESVÍO',    bus:'ABC-1234', conductor:'Marcos E. Silva',hora:'06:50', nivel:'BAJO',    resuelta:true  }),
-      new AlertaAdmin({ id:5, tipo:'PÁNICO',    bus:'DEF-5678', conductor:'Juan Quispe',    hora:'06:20', nivel:'CRITICO', resuelta:true  }),
+      new AlertaAdmin({ id:1, tipo:'PÁNICO',    bus:'GHI-9012', conductor:'Pedro Mamani',    hora:'07:05', nivel:'CRITICO', resuelta:false }),
+      new AlertaAdmin({ id:2, tipo:'VELOCIDAD', bus:'GHI-9012', conductor:'Pedro Mamani',    hora:'07:02', nivel:'ALTO',    resuelta:false }),
+      new AlertaAdmin({ id:3, tipo:'PASAJEROS', bus:'GHI-9012', conductor:'Pedro Mamani',    hora:'07:30', nivel:'MEDIO',   resuelta:false }),
+      new AlertaAdmin({ id:4, tipo:'DESVÍO',    bus:'ABC-1234', conductor:'Marcos E. Silva', hora:'06:50', nivel:'BAJO',    resuelta:true  }),
+      new AlertaAdmin({ id:5, tipo:'PÁNICO',    bus:'DEF-5678', conductor:'Juan Quispe',     hora:'06:20', nivel:'CRITICO', resuelta:true  }),
     ];
   }
 
-  getConductores() { return MOCK_CONDUCTORES; }
+  getConductores() {
+    return [
+      { id:1, nombre:'MARCOS E.', apellido:'SILVA',  dni:'12345678', codigoEmpleado:'EMP-001', codigoQr:'QR-SF-90210-TX', placa:'ABC-1234', estado:'ACTIVO',   foto:'https://i.pravatar.cc/80?img=11' },
+      { id:2, nombre:'JUAN',      apellido:'QUISPE', dni:'23456789', codigoEmpleado:'EMP-002', codigoQr:'QR-SF-90211-TX', placa:'DEF-5678', estado:'ACTIVO',   foto:'https://i.pravatar.cc/80?img=12' },
+      { id:3, nombre:'PEDRO',     apellido:'MAMANI', dni:'34567890', codigoEmpleado:'EMP-003', codigoQr:'QR-SF-90212-TX', placa:'GHI-9012', estado:'INACTIVO', foto:'https://i.pravatar.cc/80?img=13' },
+      { id:4, nombre:'MIGUEL',    apellido:'FLORES', dni:'45678901', codigoEmpleado:'EMP-004', codigoQr:'QR-SF-90213-TX', placa:'JKL-3456', estado:'ACTIVO',   foto:'https://i.pravatar.cc/80?img=14' },
+      { id:5, nombre:'LUIS',      apellido:'CCAMA',  dni:'56789012', codigoEmpleado:'EMP-005', codigoQr:'QR-SF-90214-TX', placa:'MNO-7890', estado:'ACTIVO',   foto:'https://i.pravatar.cc/80?img=15' },
+      { id:6, nombre:'CARLOS',    apellido:'HUANCA', dni:'67890123', codigoEmpleado:'EMP-006', codigoQr:'QR-SF-90215-TX', placa:'PQR-1234', estado:'ACTIVO',   foto:'https://i.pravatar.cc/80?img=16' },
+      { id:7, nombre:'ROBERTO',   apellido:'APAZA',  dni:'78901234', codigoEmpleado:'EMP-007', codigoQr:'QR-SF-90216-TX', placa:'STU-5678', estado:'ACTIVO',   foto:'https://i.pravatar.cc/80?img=17' },
+    ];
+  }
 
   getHistorial(): TurnoHistorial[] {
     return [
