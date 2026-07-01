@@ -10,8 +10,8 @@
 .cc-grid { display: grid; grid-template-columns: 1fr 320px; gap: 16px; flex: 1; min-height: 0; }
 .cc-map { display: flex; flex-direction: column; }
 .map-wrap { flex: 1; position: relative; min-height: 300px; overflow: hidden; border: 1px solid var(--sb-border); }
-.bus-pins { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: space-around; flex-wrap: wrap; gap: 8px; padding: 16px; }
-.bus-pin mat-icon { font-size: 20px; filter: drop-shadow(0 0 4px currentColor); }
+.leaflet-host { width: 100%; height: 100%; }
+.unit-row, .alert-row { cursor: pointer; }
 
 .cc-right { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
 .unit-rows { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
