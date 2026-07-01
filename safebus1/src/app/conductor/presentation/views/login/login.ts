@@ -33,12 +33,13 @@ export class Login {
     this.router.navigate(['/conductor/qr-scanner']);
   }
 
-  verify() {
-    const code = this.codigoEmpleado();
-    if (!code.trim()) { this.errors.set(['empty']); return; }
-    this.loading.set(true);
-    this.errors.set([]);
-    this.api.verifyByCode(code).subscribe(conductor => {
+verify() {
+  const code = this.codigoEmpleado();
+  if (!code.trim()) { this.errors.set(['empty']); return; }
+  this.loading.set(true);
+  this.errors.set([]);
+  this.api.verifyByCode(code).subscribe({
+    next: (conductor) => {
       this.loading.set(false);
       if (conductor) {
         this.state.setConductor(conductor);
@@ -46,6 +47,11 @@ export class Login {
       } else {
         this.errors.set(['invalid']);
       }
-    });
-  }
+    },
+    error: () => {
+      this.loading.set(false);
+      this.errors.set(['invalid']);
+    }
+  });
+}
 }
