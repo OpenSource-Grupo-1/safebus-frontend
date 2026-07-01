@@ -17,7 +17,7 @@ export class DriverManagement {
 
   get filtered() {
     const t = this.searchTerm().toLowerCase();
-    return this.conductores().filter(c =>
+    return this.conductores().filter((c: any) =>
       c.nombre.toLowerCase().includes(t) || c.apellido.toLowerCase().includes(t) || c.dni.includes(t)
     );
   }
