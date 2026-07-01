@@ -1,5 +1,4 @@
 <div class="cc-root">
-  <!-- KPI row -->
   <div class="kpi-row">
     <div class="kpi-card">
       <mat-icon>directions_bus</mat-icon>
@@ -25,32 +24,19 @@
   </div>
 
   <div class="cc-grid">
-    <!-- Map -->
     <div class="cc-map sb-card">
       <p class="section-label">MAPA OPERACIONAL EN TIEMPO REAL</p>
       <div class="map-wrap">
-        <iframe
-          src="https://www.openstreetmap.org/export/embed.html?bbox=-77.1000,-12.1500,-76.9000,-11.9500&layer=mapnik"
-          width="100%" height="100%" style="border:none; filter:brightness(0.7) saturate(0.5);" title="Mapa Lima Admin">
-        </iframe>
-        <div class="bus-pins">
-          @for (u of unidades(); track u.id) {
-            <div class="bus-pin" [style.color]="estadoColor(u.estado)" [title]="u.placa + ' - ' + u.conductor">
-              <mat-icon>directions_bus</mat-icon>
-            </div>
-          }
-        </div>
+        <div id="admin-map" class="leaflet-host"></div>
       </div>
     </div>
 
-    <!-- Right panel -->
     <div class="cc-right">
-      <!-- Unit list -->
       <div class="sb-card unit-list">
         <p class="section-label">ESTADO DE UNIDADES</p>
         <div class="unit-rows">
           @for (u of unidades(); track u.id) {
-            <div class="unit-row">
+            <div class="unit-row" (click)="focarUnidad(u.placa)">
               <div class="unit-left">
                 <mat-icon [style.color]="estadoColor(u.estado)">directions_bus</mat-icon>
                 <div>
@@ -67,11 +53,10 @@
         </div>
       </div>
 
-      <!-- Alerts -->
       <div class="sb-card alert-list">
         <p class="section-label">ALERTAS RECIENTES</p>
         @for (a of alertas(); track a.id) {
-          <div class="alert-row" [class.resolved]="a.resuelta">
+          <div class="alert-row" [class.resolved]="a.resuelta" (click)="focarUnidad(a.bus)">
             <div class="alert-left">
               <span class="alert-nivel" [style.color]="nivelColor(a.nivel)">{{ a.nivel }}</span>
               <div>
@@ -80,7 +65,7 @@
               </div>
             </div>
             @if (!a.resuelta) {
-              <button class="resolve-btn" (click)="resolverAlerta(a.id)">RESOLVER</button>
+              <button class="resolve-btn" (click)="resolverAlerta(a.id); $event.stopPropagation()">RESOLVER</button>
             } @else {
               <span class="resolved-badge">RESUELTO</span>
             }
