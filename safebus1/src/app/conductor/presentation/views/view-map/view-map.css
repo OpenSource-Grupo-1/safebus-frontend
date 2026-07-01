@@ -3,7 +3,8 @@
   grid-template-columns: 1fr 200px;
   height: calc(100vh - 48px);
 }
-.map-area { overflow: hidden; border-right: 1px solid var(--sb-border); }
+.map-area { overflow: hidden; border-right: 1px solid var(--sb-border); position: relative; }
+.leaflet-host { width: 100%; height: 100%; }
 .map-stats {
   background: var(--sb-bg);
   padding: 24px 16px;
