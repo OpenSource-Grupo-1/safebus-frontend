@@ -20,8 +20,25 @@ export class ConductorApiEndpoint {
   verifyByCode(codigo: string): Observable<Conductor | null> {
     const url = `${environment.platformProviderApiBaseUrl}/employees/code/${codigo}`;
     return this.http.get<any>(url).pipe(
-      map(response => response ? this.assembler.toEntityFromResource(response) : null)
+      map(response => response ? this.mapEmployeeToConductor(response) : null)
     );
+  }
+
+  private mapEmployeeToConductor(employee: any): Conductor {
+    const partes = (employee.fullName ?? '').trim().split(' ');
+    const nombre = partes.shift() ?? employee.fullName ?? '';
+    const apellido = partes.join(' ');
+    return new Conductor({
+      id: employee.id,
+      nombre,
+      apellido,
+      dni: '',
+      codigoEmpleado: employee.employeeCode,
+      codigoQr: `QR-${employee.employeeCode}`,
+      placa: '',
+      estado: 'ACTIVO',
+      foto: `https://i.pravatar.cc/80?u=${employee.employeeCode}`,
+    });
   }
 
   getMockList(): Conductor[] { return []; }
