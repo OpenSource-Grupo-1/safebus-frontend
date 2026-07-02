@@ -24,11 +24,15 @@ export class QrScanner implements OnDestroy {
   scanning       = signal(true);
   conductorFound = signal<Conductor | null>(null);
   scanLine       = signal(0);
+  errorMsg       = signal('');
+
+  /** Códigos de empleado reales que sí existen en el backend (creados por el seeder). */
+  private codigosRegistrados = ['EMP-001', 'EMP-002', 'EMP-003', 'EMP-004', 'EMP-005', 'EMP-006', 'EMP-007'];
 
   private interval: ReturnType<typeof setInterval>;
 
   constructor() {
-    // simulate scan line animation + auto-detect after 3s
+    // animación de la línea de escaneo + auto-detección simulada a los 3s
     this.interval = setInterval(() => {
       this.scanLine.update(v => (v + 3) % 100);
     }, 30);
@@ -37,16 +41,31 @@ export class QrScanner implements OnDestroy {
   }
 
   private simulateScan() {
-    this.api.verifyByCode('QR-SF-90210-TX').subscribe(c => {
-      if (c) { this.conductorFound.set(c); this.state.setConductor(c); }
+    if (this.conductorFound()) return; // si ya validó manualmente, no pises el resultado
+
+    const codigoAleatorio = this.codigosRegistrados[Math.floor(Math.random() * this.codigosRegistrados.length)];
+    this.api.verifyByCode(codigoAleatorio).subscribe({
+      next: (c) => {
+        if (c) { this.conductorFound.set(c); this.state.setConductor(c); }
+      },
+      error: () => { this.errorMsg.set('No se pudo validar el escaneo automático.'); },
     });
   }
 
   validate() {
     const code = this.manualCode();
     if (!code.trim()) return;
-    this.api.verifyByCode(code).subscribe(c => {
-      if (c) { this.conductorFound.set(c); this.state.setConductor(c); }
+    this.errorMsg.set('');
+    this.api.verifyByCode(code).subscribe({
+      next: (c) => {
+        if (c) {
+          this.conductorFound.set(c);
+          this.state.setConductor(c);
+        } else {
+          this.errorMsg.set('Código inválido.');
+        }
+      },
+      error: () => { this.errorMsg.set('Código inválido.'); },
     });
   }
 
