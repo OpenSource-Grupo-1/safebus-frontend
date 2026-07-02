@@ -11,6 +11,10 @@
       <span class="sb-label">DISTANCIA</span>
       <span class="stat-val accent">{{ distancia() | number:'1.1-1' }} KM</span>
     </div>
+    <div class="stat-block">
+      <span class="sb-label">MI CÓDIGO</span>
+      <span class="stat-val mono" style="font-size:16px;">{{ codigoDebug() }}</span>
+    </div>
     <button class="sb-btn-outline back-btn" (click)="goBack()">
       <mat-icon>arrow_back</mat-icon> VOLVER
     </button>
