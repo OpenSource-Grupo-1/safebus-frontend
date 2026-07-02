@@ -1,12 +1,13 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { DatePipe, DecimalPipe } from '@angular/common';
-import { ConductorApi } from '../../../infrastructure/conductor-api';
+import { DecimalPipe } from '@angular/common';
+import { ConductorStateService } from '../../../infrastructure/conductor-state.service';
+import { FleetTrackingService } from '../../../../shared/infrastructure/fleet-tracking.service';
 
 @Component({
   selector: 'app-alert-logs',
   standalone: true,
-  imports: [MatIconModule, DatePipe, DecimalPipe],
+  imports: [MatIconModule, DecimalPipe],
   template: `
 <div class="al-root">
   <div class="al-header">
@@ -14,7 +15,6 @@ import { ConductorApi } from '../../../infrastructure/conductor-api';
     <p class="al-sub">Registro de alertas enviadas durante el servicio</p>
   </div>
 
-  <!-- Summary -->
   <div class="al-summary">
     <div class="sum-card">
       <mat-icon style="color:var(--sb-red)">emergency</mat-icon>
@@ -23,27 +23,24 @@ import { ConductorApi } from '../../../infrastructure/conductor-api';
     </div>
     <div class="sum-card">
       <mat-icon style="color:#ff6d00">speed</mat-icon>
-      <span class="sum-val" style="color:#ff6d00">{{ velCount() }}</span>
+      <span class="sum-val" style="color:#ff6d00">0</span>
       <span class="sb-label">VELOCIDAD</span>
     </div>
     <div class="sum-card">
       <mat-icon style="color:#f0a000">alt_route</mat-icon>
-      <span class="sum-val" style="color:#f0a000">{{ desvioCount() }}</span>
+      <span class="sum-val" style="color:#f0a000">0</span>
       <span class="sb-label">DESVÍOS</span>
     </div>
     <div class="sum-card">
       <mat-icon style="color:var(--sb-accent)">people</mat-icon>
-      <span class="sum-val" style="color:var(--sb-accent)">{{ pasajCount() }}</span>
+      <span class="sum-val" style="color:var(--sb-accent)">0</span>
       <span class="sb-label">PASAJEROS</span>
     </div>
   </div>
 
-  <!-- Logs table -->
   <div class="sb-card al-table-card">
     <p class="section-label">HISTORIAL DE ALERTAS</p>
-    @if (loading()) {
-      <div class="loading-row"><mat-icon class="spin">sync</mat-icon> Cargando alertas...</div>
-    } @else if (alertas().length === 0) {
+    @if (misAlertas().length === 0) {
       <div class="no-alerts">
         <mat-icon>check_circle</mat-icon>
         <p>Sin alertas registradas en este turno</p>
@@ -52,15 +49,15 @@ import { ConductorApi } from '../../../infrastructure/conductor-api';
       <div class="al-table">
         <div class="al-header-row">
           <span>NIVEL</span><span>TIPO</span><span>DESCRIPCIÓN</span>
-          <span>TIMESTAMP</span><span>COORDS</span><span>ESTADO</span>
+          <span>HORA</span><span>COORDS</span><span>ESTADO</span>
         </div>
-        @for (a of alertas(); track a.id) {
+        @for (a of misAlertas(); track a.id) {
           <div class="al-row">
-            <span class="nivel-badge" [style.color]="nivelColor(a.estadoCentral)">{{ a.estadoCentral }}</span>
-            <span class="al-tipo">ALERTA</span>
-            <span class="al-desc">Alerta #{{ a.id }} — Unidad BUS-7729</span>
-            <span class="al-mono">{{ a.timestamp | date:'dd/MM HH:mm' }}</span>
-            <span class="al-mono">{{ a.latitud | number:'1.2-2' }}, {{ a.longitud | number:'1.2-2' }}</span>
+            <span class="nivel-badge" [style.color]="nivelColor(a.nivel)">{{ a.nivel }}</span>
+            <span class="al-tipo">{{ a.tipo }}</span>
+            <span class="al-desc">Alerta #{{ a.id }} — Unidad {{ a.bus }}</span>
+            <span class="al-mono">{{ a.hora }}</span>
+            <span class="al-mono">{{ a.lat | number:'1.4-4' }}, {{ a.lng | number:'1.4-4' }}</span>
             <span class="al-estado" [class.resuelta]="a.resuelta">{{ a.resuelta ? 'RESUELTA' : 'ACTIVA' }}</span>
           </div>
         }
@@ -77,13 +74,9 @@ import { ConductorApi } from '../../../infrastructure/conductor-api';
 .sum-card mat-icon { font-size:28px; width:28px; height:28px; }
 .sum-val { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:36px; line-height:1; }
 .section-label { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; letter-spacing:0.2em; color:var(--sb-gray); text-transform:uppercase; margin-bottom:14px; }
-.loading-row { display:flex; align-items:center; gap:8px; color:var(--sb-gray); font-size:13px; padding:20px 0; }
-.spin { animation:spin 1s linear infinite; }
-@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 .no-alerts { display:flex; flex-direction:column; align-items:center; gap:12px; padding:40px; color:var(--sb-accent); }
 .no-alerts mat-icon { font-size:40px; width:40px; height:40px; }
 .no-alerts p { font-size:13px; color:var(--sb-gray); }
-.al-table { }
 .al-header-row,.al-row { display:grid; grid-template-columns:1fr 1fr 2fr 1.2fr 1.5fr 1fr; padding:8px 12px; border-bottom:1px solid var(--sb-border); gap:8px; align-items:center; }
 .al-header-row { background:var(--sb-bg-card2); }
 .al-header-row span { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:10px; letter-spacing:0.15em; color:var(--sb-gray); }
@@ -95,31 +88,17 @@ import { ConductorApi } from '../../../infrastructure/conductor-api';
 .al-estado.resuelta { color:var(--sb-accent); }
 `]
 })
-export class AlertLogs implements OnInit {
-  private api = inject(ConductorApi);
-  alertas = signal<any[]>([]);
-  loading = signal(true);
+export class AlertLogs {
+  private state = inject(ConductorStateService);
+  private fleet = inject(FleetTrackingService);
 
-  get panicCount()  { return () => this.alertas().filter(a => a.estadoCentral === 'CRITICO').length; }
-  get velCount()    { return () => this.alertas().filter(a => a.estadoCentral === 'ALTO').length; }
-  get desvioCount() { return () => this.alertas().filter(a => a.estadoCentral === 'BAJO').length; }
-  get pasajCount()  { return () => this.alertas().filter(a => a.estadoCentral === 'MEDIO').length; }
+  misAlertas = computed(() => {
+    const codigo = this.state.conductorActual()?.codigoEmpleado;
+    if (!codigo) return [];
+    return this.fleet.alertas().filter(a => a.codigoEmpleado === codigo);
+  });
 
-  ngOnInit() {
-    this.api.getAlertas().subscribe({
-      next: (list) => { this.alertas.set(list); this.loading.set(false); },
-      error: () => {
-        // Use mock data if API not available
-        this.alertas.set([
-          { id:1, estadoCentral:'CRITICO', latitud:-12.156,  longitud:-76.972, timestamp:new Date('2025-04-26T07:05:00'), resuelta:false },
-          { id:2, estadoCentral:'ALTO',    latitud:-12.158,  longitud:-76.975, timestamp:new Date('2025-04-26T07:02:00'), resuelta:false },
-          { id:3, estadoCentral:'MEDIO',   latitud:-12.156,  longitud:-76.972, timestamp:new Date('2025-04-26T07:30:00'), resuelta:false },
-          { id:4, estadoCentral:'BAJO',    latitud:-12.051,  longitud:-77.048, timestamp:new Date('2025-04-25T07:00:00'), resuelta:true  },
-        ]);
-        this.loading.set(false);
-      }
-    });
-  }
+  panicCount = computed(() => this.misAlertas().filter(a => a.tipo === 'PÁNICO').length);
 
   nivelColor(nivel: string): string {
     return nivel === 'CRITICO' ? 'var(--sb-red)' : nivel === 'ALTO' ? '#ff6d00' : nivel === 'MEDIO' ? '#f0a000' : 'var(--sb-gray)';
