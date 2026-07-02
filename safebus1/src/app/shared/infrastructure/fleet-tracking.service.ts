@@ -26,11 +26,6 @@ export interface AlertaTrack {
   lng: number;
 }
 
-/**
- * Simula el movimiento en tiempo real de la flota de buses y centraliza
- * las alertas de panico para que el conductor y el panel de administracion
- * compartan el mismo estado dentro de la sesion del navegador
- */
 @Injectable({ providedIn: 'root' })
 export class FleetTrackingService {
   readonly unidades = signal<UnidadTrack[]>([
@@ -52,18 +47,17 @@ export class FleetTrackingService {
     this.iniciarSimulacion();
   }
 
-  /** Mueve todas las unidades activas de forma lenta y semi-aleatoria. */
   private iniciarSimulacion() {
     if (this.intervalRef) return;
     this.intervalRef = setInterval(() => {
       this.unidades.update(list => list.map(u => {
         if (u.estado === 'INACTIVO') return u;
         let heading = this.headings.get(u.id);
-        if (heading === undefined || Math.random() < 0.15) {
+        if (heading === undefined || Math.random() < 0.08) {
           heading = Math.random() * Math.PI * 2;
           this.headings.set(u.id, heading);
         }
-        const paso = 0.00012;
+        const paso = 0.0004; // ~45m cada 2s, bien visible
         return { ...u, lat: u.lat + Math.cos(heading) * paso, lng: u.lng + Math.sin(heading) * paso };
       }));
     }, 2000);
@@ -73,16 +67,15 @@ export class FleetTrackingService {
     return this.unidades().find(u => u.codigoEmpleado === codigoEmpleado);
   }
 
-  /** Avanza la unidad del conductor logueado según la distancia que va recorriendo. */
   moverUnidadPorDistancia(codigoEmpleado: string, deltaKm: number) {
     this.unidades.update(list => list.map(u => {
       if (u.codigoEmpleado !== codigoEmpleado || u.estado === 'INACTIVO') return u;
       let heading = this.headings.get(u.id);
-      if (heading === undefined || Math.random() < 0.2) {
+      if (heading === undefined || Math.random() < 0.1) {
         heading = Math.random() * Math.PI * 2;
         this.headings.set(u.id, heading);
       }
-      const paso = deltaKm * 0.009;
+      const paso = deltaKm * 0.03; // más marcado que antes
       return { ...u, lat: u.lat + Math.cos(heading) * paso, lng: u.lng + Math.sin(heading) * paso };
     }));
   }
