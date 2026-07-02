@@ -1,4 +1,4 @@
-import { Component, inject, effect, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, effect, AfterViewInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { DecimalPipe } from '@angular/common';
@@ -22,15 +22,17 @@ export class ViewMap implements AfterViewInit, OnDestroy {
   tiempoStr = this.state.tiempoStr;
   distancia = this.state.distanciaKm;
 
+  /** Solo para diagnóstico visual: confirma si el código de empleado llegó bien. */
+  codigoDebug = signal('(sin código)');
+
   private map: any;
   private marker: any;
   private codigoEmpleado = '';
 
   constructor() {
-    // Cada vez que la flota se mueve, movemos SOLO el marcador (sin
-    // recentrar la camara), para que se vea el bus desplazándose de verdad
     effect(() => {
-      const unidad = this.fleet.unidades().find(u => u.codigoEmpleado === this.codigoEmpleado);
+      const lista = this.fleet.unidades();
+      const unidad = lista.find(u => u.codigoEmpleado === this.codigoEmpleado) ?? lista[0];
       if (unidad && this.marker) {
         this.marker.setLatLng([unidad.lat, unidad.lng]);
       }
@@ -39,11 +41,13 @@ export class ViewMap implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.codigoEmpleado = this.state.conductorActual()?.codigoEmpleado ?? '';
-    const unidad = this.fleet.getUnidadByCodigo(this.codigoEmpleado);
+    this.codigoDebug.set(this.codigoEmpleado || '⚠️ VACÍO — revisa conductor-api-endpoint.ts');
+
+    const unidad = this.fleet.getUnidadByCodigo(this.codigoEmpleado) ?? this.fleet.unidades()[0];
     const lat = unidad?.lat ?? -12.0464;
     const lng = unidad?.lng ?? -77.0428;
 
-    this.map = L.map('conductor-map', { zoomControl: true }).setView([lat, lng], 15);
+    this.map = L.map('conductor-map', { zoomControl: true }).setView([lat, lng], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 19,
