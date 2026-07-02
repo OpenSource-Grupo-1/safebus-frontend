@@ -18,6 +18,7 @@ export interface AlertaTrack {
   tipo: string;
   bus: string;
   conductor: string;
+  codigoEmpleado: string;
   hora: string;
   nivel: 'CRITICO' | 'ALTO' | 'MEDIO' | 'BAJO';
   resuelta: boolean;
@@ -96,6 +97,7 @@ export class FleetTrackingService {
       tipo: 'PÁNICO',
       bus: unidad.placa,
       conductor: unidad.conductor,
+      codigoEmpleado: unidad.codigoEmpleado,
       hora,
       nivel: 'CRITICO',
       resuelta: false,
