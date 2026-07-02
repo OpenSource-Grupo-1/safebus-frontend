@@ -11,11 +11,6 @@ export class ConductorStateService {
   readonly turnoActual     = signal<Turno | null>(null);
   readonly turnoActivo     = signal(false);
 
-  /**
-   * Tiempo y distancia del turno viven aquí, centralizados, para que NO se
-   * reinicien cada vez que el conductor navega entre pantallas (dashboard,
-   * mapa, etc) El cronómetro corre una sola vez mientras el turno está activo
-   */
   readonly tiempoSegundos = signal(0);
   readonly distanciaKm    = signal(0);
   readonly pasajeros      = signal(0);
@@ -31,12 +26,16 @@ export class ConductorStateService {
 
   private timer: ReturnType<typeof setInterval> | null = null;
 
-  setConductor(c: Conductor) { this.conductorActual.set(c); }
+  setConductor(c: Conductor) {
+    this.conductorActual.set(c);
+    this.fleet.setCodigoPropio(c.codigoEmpleado);
+  }
 
   clearConductor() {
     this.conductorActual.set(null);
     this.turnoActual.set(null);
     this.turnoActivo.set(false);
+    this.fleet.setCodigoPropio(null);
     this.detenerTimer();
   }
 
@@ -71,7 +70,6 @@ export class ConductorStateService {
         this.recaudacion.update(v => +(v + Math.random() * 2.5).toFixed(2));
       }
 
-      // El bus se sigue moviendo aunque el conductor no esté viendo el mapa.
       const codigo = this.conductorActual()?.codigoEmpleado;
       if (codigo) this.fleet.moverUnidadPorDistancia(codigo, deltaKm);
 
