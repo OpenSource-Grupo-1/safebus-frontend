@@ -1,15 +1,44 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Conductor } from '../domain/model/conductor.entity';
 import { Turno } from '../domain/model/turno.entity';
+import { FleetTrackingService } from '../../shared/infrastructure/fleet-tracking.service';
 
 @Injectable({ providedIn: 'root' })
 export class ConductorStateService {
+  private fleet = inject(FleetTrackingService);
+
   readonly conductorActual = signal<Conductor | null>(null);
   readonly turnoActual     = signal<Turno | null>(null);
   readonly turnoActivo     = signal(false);
 
+  /**
+   * Tiempo y distancia del turno viven aquí, centralizados, para que NO se
+   * reinicien cada vez que el conductor navega entre pantallas (dashboard,
+   * mapa, etc) El cronómetro corre una sola vez mientras el turno está activo
+   */
+  readonly tiempoSegundos = signal(0);
+  readonly distanciaKm    = signal(0);
+  readonly pasajeros      = signal(0);
+  readonly recaudacion    = signal(0);
+
+  readonly tiempoStr = computed(() => {
+    const s = this.tiempoSegundos();
+    const h = Math.floor(s / 3600).toString().padStart(2, '0');
+    const m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${sec}`;
+  });
+
+  private timer: ReturnType<typeof setInterval> | null = null;
+
   setConductor(c: Conductor) { this.conductorActual.set(c); }
-  clearConductor() { this.conductorActual.set(null); this.turnoActual.set(null); this.turnoActivo.set(false); }
+
+  clearConductor() {
+    this.conductorActual.set(null);
+    this.turnoActual.set(null);
+    this.turnoActivo.set(false);
+    this.detenerTimer();
+  }
 
   iniciarTurno(busId: string) {
     const c = this.conductorActual();
@@ -21,11 +50,49 @@ export class ConductorStateService {
       estado: 'ACTIVO', fechaInicio: new Date(), fechaFin: null,
     }));
     this.turnoActivo.set(true);
+    this.tiempoSegundos.set(0);
+    this.distanciaKm.set(0);
+    this.pasajeros.set(0);
+    this.recaudacion.set(0);
+    this.iniciarTimer();
+  }
+
+  private iniciarTimer() {
+    this.detenerTimer();
+    this.timer = setInterval(() => {
+      if (!this.turnoActivo()) return;
+
+      this.tiempoSegundos.update(v => v + 1);
+      const deltaKm = 0.003;
+      this.distanciaKm.update(v => +(v + deltaKm).toFixed(3));
+
+      if (this.tiempoSegundos() % 15 === 0) {
+        this.pasajeros.update(v => v + Math.floor(Math.random() * 3));
+        this.recaudacion.update(v => +(v + Math.random() * 2.5).toFixed(2));
+      }
+
+      // El bus se sigue moviendo aunque el conductor no esté viendo el mapa.
+      const codigo = this.conductorActual()?.codigoEmpleado;
+      if (codigo) this.fleet.moverUnidadPorDistancia(codigo, deltaKm);
+
+      const t = this.turnoActual();
+      if (t) {
+        t.tiempoSegundos = this.tiempoSegundos();
+        t.distanciaKm    = this.distanciaKm();
+        t.pasajeros       = this.pasajeros();
+        t.recaudacion     = this.recaudacion();
+      }
+    }, 1000);
+  }
+
+  private detenerTimer() {
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }
   }
 
   finalizarTurno() {
     const t = this.turnoActual();
     if (t) { t.estado = 'FINALIZADO'; t.fechaFin = new Date(); }
     this.turnoActivo.set(false);
+    this.detenerTimer();
   }
 }
