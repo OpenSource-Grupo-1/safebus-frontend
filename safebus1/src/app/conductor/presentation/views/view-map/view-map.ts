@@ -21,8 +21,6 @@ export class ViewMap implements AfterViewInit, OnDestroy {
 
   tiempoStr = this.state.tiempoStr;
   distancia = this.state.distanciaKm;
-
-  /** Solo para diagnóstico visual: confirma si el código de empleado llegó bien. */
   codigoDebug = signal('(sin código)');
 
   private map: any;
