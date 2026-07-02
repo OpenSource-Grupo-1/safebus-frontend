@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, inject, effect, AfterViewInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { DecimalPipe } from '@angular/common';
@@ -14,41 +14,31 @@ declare const L: any;
   templateUrl: './view-map.html',
   styleUrl: './view-map.css',
 })
-export class ViewMap implements OnInit, AfterViewInit, OnDestroy {
+export class ViewMap implements AfterViewInit, OnDestroy {
   private router = inject(Router);
-  private state  = inject(ConductorStateService);
+  readonly state = inject(ConductorStateService);
   private fleet  = inject(FleetTrackingService);
 
-  tiempoStr = signal('00:00:00');
-  distancia = signal(0);
+  tiempoStr = this.state.tiempoStr;
+  distancia = this.state.distanciaKm;
 
-  private timer: ReturnType<typeof setInterval> | null = null;
-  private seconds = 0;
-  private codigoEmpleado = '';
   private map: any;
   private marker: any;
+  private codigoEmpleado = '';
 
-  ngOnInit() {
-    const t = this.state.turnoActual();
-    if (t) { this.seconds = t.tiempoSegundos; this.distancia.set(t.distanciaKm); }
-    this.tiempoStr.set(this.formatTime(this.seconds));
-    this.codigoEmpleado = this.state.conductorActual()?.codigoEmpleado ?? '';
-
-    this.timer = setInterval(() => {
-      this.seconds++;
-      this.tiempoStr.set(this.formatTime(this.seconds));
-
-      const deltaKm = 0.003;
-      this.distancia.update(v => +(v + deltaKm).toFixed(3));
-
-      if (this.codigoEmpleado) {
-        this.fleet.moverUnidadPorDistancia(this.codigoEmpleado, deltaKm);
+  constructor() {
+    // Cada vez que la flota se mueve, movemos SOLO el marcador (sin
+    // recentrar la camara), para que se vea el bus desplazándose de verdad
+    effect(() => {
+      const unidad = this.fleet.unidades().find(u => u.codigoEmpleado === this.codigoEmpleado);
+      if (unidad && this.marker) {
+        this.marker.setLatLng([unidad.lat, unidad.lng]);
       }
-      this.actualizarMarcador();
-    }, 1000);
+    });
   }
 
   ngAfterViewInit() {
+    this.codigoEmpleado = this.state.conductorActual()?.codigoEmpleado ?? '';
     const unidad = this.fleet.getUnidadByCodigo(this.codigoEmpleado);
     const lat = unidad?.lat ?? -12.0464;
     const lng = unidad?.lng ?? -77.0428;
@@ -63,25 +53,8 @@ export class ViewMap implements OnInit, AfterViewInit, OnDestroy {
     this.marker = L.marker([lat, lng], { icon }).addTo(this.map);
   }
 
-  private actualizarMarcador() {
-    const unidad = this.fleet.getUnidadByCodigo(this.codigoEmpleado);
-    if (unidad && this.marker && this.map) {
-      const nuevaPos: [number, number] = [unidad.lat, unidad.lng];
-      this.marker.setLatLng(nuevaPos);
-      this.map.panTo(nuevaPos, { animate: true, duration: 1 });
-    }
-  }
-
   ngOnDestroy() {
-    if (this.timer) clearInterval(this.timer);
     if (this.map) this.map.remove();
-  }
-
-  private formatTime(s: number): string {
-    const h = Math.floor(s / 3600).toString().padStart(2, '0');
-    const m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
-    const sec = (s % 60).toString().padStart(2, '0');
-    return `${h}:${m}:${sec}`;
   }
 
   goBack() { this.router.navigate(['/conductor/dashboard']); }
